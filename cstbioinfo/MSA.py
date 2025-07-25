@@ -1,12 +1,13 @@
+import os
+import shutil
+import subprocess
+import tempfile
+from typing import Optional, Union
+
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from pymsaviz import MsaViz
-import tempfile
-import os
-from typing import Optional, Union
-import subprocess
-import shutil
 
 
 def _nuc_or_aa(seq: str) -> str:
