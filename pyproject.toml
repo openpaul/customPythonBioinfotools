@@ -1,0 +1,34 @@
+[project]
+name = "cstbioinfo"
+version = "0.1.0"
+description = "My personal bioinfo usefull tools."
+readme = "README.md"
+authors = [{name = "Paul Saary", email = "github@paulsaary.de"}]
+license = "Apache-2.0"
+requires-python = ">=3.10"
+classifiers = []
+dependencies = [
+    "p9customtheme",
+    "plotnine>=0.14.5",
+    "biopython>=1.80",
+    "pymsaviz>=0.4.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cstbioinfo*"]
+exclude = ["tests*"]
+
+[project.urls]
+Homepage = "https://github.com/openpaul/cstbioinfo"
+Changelog = "https://github.com/openpaul/cstbioinfo/releases"
+Issues = "https://github.com/openpaul/cstbioinfo/issues"
+CI = "https://github.com/openpaul/cstbioinfo/actions"
+
+
+[project.optional-dependencies]
+test = ["pytest",  "polars", "pyarrow", "ruff"]
