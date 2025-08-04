@@ -1,8 +1,11 @@
 """
-cstbioinfo - Custom bioinformatics tools
+cstbioinfo - Personal bioinformatics tools
+==========================================
 
-A personal collection of bioinformatics utilities focused on making
-common workflows easier, especially in notebook environments.
+A collection of useful bioinformatics tools and utilities.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
+# You can import your modules here when you create them
+from .tax import TaxId
+from .msa import msa, plot_msa
