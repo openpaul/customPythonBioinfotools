@@ -1,11 +1,11 @@
-from dataclasses import dataclass, field
-from ete3 import NCBITaxa
-from dataclasses import dataclass
-from pathlib import Path
-from typing import List, Tuple, Optional, Union
-import polars as pl
 import sqlite3
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import List, Optional, Tuple
+
+import polars as pl
 from appdirs import user_data_dir
+from ete3 import NCBITaxa
 
 ncbi = NCBITaxa()
 
