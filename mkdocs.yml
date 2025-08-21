@@ -54,6 +54,8 @@ plugins:
           paths: [cstbioinfo]
           options:
             docstring_style: google
-            show_source: false
+            show_source: true
             show_root_heading: true
             show_root_toc_entry: false
+            extra:
+              show_source_link: true
