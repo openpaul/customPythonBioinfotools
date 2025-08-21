@@ -159,17 +159,6 @@ class UniProtTax:
         conn.execute(query)
         conn.commit()
 
-    def describe_tables(self) -> None:
-        # print out table names and their columns
-        query = "SELECT name FROM sqlite_master WHERE type='table';"
-        tables = self.conn.execute(query).fetchall()
-        for table in tables:
-            print(f"Table: {table[0]}")
-            query = f"PRAGMA table_info({table[0]});"
-            columns = self.conn.execute(query).fetchall()
-            for column in columns:
-                print(f"  Column: {column[1]} - Type: {column[2]}")
-
     def get_lineage(self, tax_id: int) -> List[TaxEntry]:
         """Get taxonomic lineage as a list of TaxEntry objects"""
         query = """
