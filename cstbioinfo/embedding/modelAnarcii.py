@@ -14,7 +14,7 @@ class ANARCIIEmbedder(Embedder):
 
     def __init__(
         self,
-        model_type: str = "tcr",
+        model_type: str = "antibody",
         mode: str = "accuracy",
         device: str | torch.device | None = None,
     ):
