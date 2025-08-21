@@ -1,5 +1,5 @@
 """
-Taxonomy module for working with NCBI and UniProt taxonom    Examples:
+Taxonomy module for working with NCBI and UniProt taxonomic databases.
         >>> from cstbioinfo.tax import TaxId
         >>> # Get taxonomic info for humans (taxid 9606)
         >>> human = TaxId(9606)
@@ -82,6 +82,9 @@ class TaxId:
         print(human.Lineage)
         # {'superkingdom': 'Eukaryota', 'kingdom': 'Metazoa', ...}
         ```
+        >>> human = TaxId(9606)
+        >>> human.Species
+        'Homo sapiens'
     """
 
     taxid: int
