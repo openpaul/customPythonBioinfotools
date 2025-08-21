@@ -53,9 +53,17 @@ full = [
     "cstbioinfo[embedding]",
 ]
 
-# Development dependencies (full + testing tools)
+# Documentation dependencies
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+
+# Development dependencies (full + testing tools + docs)
 dev = [
     "cstbioinfo[full]",
+    "cstbioinfo[docs]",
     "pytest",
     "ruff",
 ]

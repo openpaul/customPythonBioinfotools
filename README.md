@@ -1,6 +1,10 @@
-# cstbioinfo
+# cstbioinfo - Custom Bioinformatics Tools
 
-Personal bioinformatics tools. Use at your own risk - pin versions for reproducibility.
+Working in bioinformatics often means that you need to quickly do some analysis, work with databases and visualize the results.
+
+Often its not hard to do, but sometimes it needs a lot of boilerplate to get where you want to be.
+
+This repo is my attempt at standardizing some common workflows I use. I will do by best to version the code and use tests to ensure that the code works as expected, but please be aware that this is a personal toolkit and changes may occur with minimal versioning.
 
 ## Features
 
