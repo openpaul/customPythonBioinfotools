@@ -88,9 +88,3 @@ The UniProtTax class automatically downloads and caches the UniProt taxonomy dat
 - **Size**: ~500MB (compressed download)
 - **Updates**: Use `UniProtTax(redownload=True)` to refresh
 
-## Performance Notes
-
-- NCBI taxonomy (TaxId) queries are fast but require internet connection
-- UniProt taxonomy database is cached locally for offline use
-- Database queries are indexed for optimal performance
-- Lineage traversal uses recursive SQL queries
