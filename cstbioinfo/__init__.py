@@ -81,10 +81,3 @@ Apache-2.0
 """
 
 __version__ = "0.1.1"
-
-# Public API
-__all__ = ["msa", "plot_msa", "TaxId", "UniProtTax"]
-
-# You can import your modules here when you create them
-from .msa import msa, plot_msa
-from .tax import TaxId, UniProtTax
