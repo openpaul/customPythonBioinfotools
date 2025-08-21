@@ -17,6 +17,24 @@ def test_embedd_anarcii():
     assert embeddings.shape == (2, embedder.dimension), "Embedding shape mismatch"
 
 
+def test_embed_antiberta2():
+    model = EmbedderModel.ANTIBERTA2
+    embedder = EmbedderModel.get_embedder(model, device="cpu", model_type="antiberta2")
+    sequences = ["CASSLGTGQYF", "CASSLGTGQYF"]
+    embeddings = embedder.embed(sequences, pool="mean", batch_size=1)
+    assert embeddings.shape == (2, embedder.dimension), "Embedding shape mismatch"
+
+
+def test_embed_antiberta2_cssp():
+    model = EmbedderModel.ANTIBERTA2
+    embedder = EmbedderModel.get_embedder(
+        model, device="cpu", model_type="antiberta2-cssp"
+    )
+    sequences = ["CASSLGTGQYF", "CASSLGTGQYF"]
+    embeddings = embedder.embed(sequences, pool="mean", batch_size=1)
+    assert embeddings.shape == (2, embedder.dimension), "Embedding shape mismatch"
+
+
 def test_embed_esm2():
     model = EmbedderModel.ESM2
     embedder = EmbedderModel.get_embedder(model, device="cpu")

@@ -1,10 +1,9 @@
 from enum import Enum
 
-import torch
-
 from cstbioinfo.embedding.types import Embedder
 
 from .modelAnarcii import ANARCIIEmbedder
+from .modelAntiberta2 import AntiBERTa2Embedder
 from .modelEsm2 import ESM2Embedder
 from .modelPiggen import pIgGenEmbedder
 
@@ -13,6 +12,7 @@ from .modelPiggen import pIgGenEmbedder
 
 class EmbedderModel(Enum):
     ANARCII = "anarcii"
+    ANTIBERTA2 = "antiberta2"
     ESM2 = "esm2"
     PIGGEN = "piggen"
 
@@ -20,6 +20,8 @@ class EmbedderModel(Enum):
     def get_embedder(cls, model: "EmbedderModel", **kwargs) -> Embedder:
         if model == cls.ANARCII:
             return ANARCIIEmbedder(**kwargs)
+        elif model == cls.ANTIBERTA2:
+            return AntiBERTa2Embedder(**kwargs)
         elif model == cls.ESM2:
             return ESM2Embedder(**kwargs)
         elif model == cls.PIGGEN:

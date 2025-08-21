@@ -44,6 +44,8 @@ embedding = [
     "numpy>=2.0.0,<2.5.0",
     "anarcii>=2.0.0,<2.1.0",  # for ANARCII embeddings
     "umap-learn==0.5.9.post2",
+    "protobuf>=6.0.0,<7.0.0",
+    "rjieba>=0.1.0,<1.0.0"
 ]
 
 # All features (normal + embedding)
