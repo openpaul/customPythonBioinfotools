@@ -1,7 +1,7 @@
-import umap as umap_package
-import polars as pl
 import numpy as np
+import polars as pl
 import torch
+import umap as umap_package
 
 
 def umap(

@@ -1,6 +1,7 @@
 from typing import List
-from tqdm import tqdm
+
 import torch
+from tqdm import tqdm
 from transformers import RoFormerForMaskedLM, RoFormerTokenizer
 
 from .types import Embedder

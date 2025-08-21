@@ -1,7 +1,8 @@
 from typing import List, Literal
-from tqdm import tqdm
+
 import torch
 import transformers
+from tqdm import tqdm
 
 from .types import Embedder
 from .utils import get_device

@@ -5,8 +5,8 @@ from cstbioinfo.embedding.types import Embedder, PairedEmbedder
 from .modelAnarcii import ANARCIIEmbedder
 from .modelAntiberta2 import AntiBERTa2Embedder
 from .modelEsm2 import ESM2Embedder
-from .modelPiggen import pIgGenEmbedder
 from .modelIgbert import IgBertEmbedder
+from .modelPiggen import pIgGenEmbedder
 
 
 class EmbedderModel(Enum):

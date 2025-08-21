@@ -91,7 +91,9 @@ class TaxEntry:
         return self.__str__()
 
     @classmethod
-    def from_db_row(cls, row: Tuple[int, Optional[str], Optional[str], Optional[str]]) -> "TaxEntry":
+    def from_db_row(
+        cls, row: Tuple[int, Optional[str], Optional[str], Optional[str]]
+    ) -> "TaxEntry":
         """Create TaxEntry from database row tuple"""
         return cls(
             taxon_id=row[0],
@@ -101,7 +103,9 @@ class TaxEntry:
         )
 
     @classmethod
-    def from_lineage_row(cls, row: Tuple[int, Optional[str], Optional[str], Optional[str]]) -> "TaxEntry":
+    def from_lineage_row(
+        cls, row: Tuple[int, Optional[str], Optional[str], Optional[str]]
+    ) -> "TaxEntry":
         """Create TaxEntry from lineage query result (without parent field)"""
         return cls(
             taxon_id=row[0],

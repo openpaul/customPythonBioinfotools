@@ -1,6 +1,6 @@
 from .embeddings import EmbedderModel, PairedEmbedderModel
-from .types import Embedder, PairedEmbedder
 from .modelIgbert import IgBertEmbedder
+from .types import Embedder, PairedEmbedder
 
 __all__ = [
     "EmbedderModel",

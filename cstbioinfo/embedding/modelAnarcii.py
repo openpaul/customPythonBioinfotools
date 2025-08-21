@@ -5,7 +5,9 @@ import torch
 from anarcii.inference.model_loader import Loader
 from anarcii.input_data_processing.tokeniser import NumberingTokeniser
 from tqdm import tqdm
+
 from cstbioinfo.embedding.types import Embedder
+
 from .utils import get_device
 
 

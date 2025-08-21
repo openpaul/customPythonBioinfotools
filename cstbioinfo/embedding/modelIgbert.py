@@ -1,6 +1,7 @@
 from typing import List, Tuple
-from tqdm import tqdm
+
 import torch
+from tqdm import tqdm
 from transformers import BertModel, BertTokenizer
 
 from .types import PairedEmbedder
