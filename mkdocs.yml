@@ -81,10 +81,10 @@ plugins:
           paths: [cstbioinfo]
           options:
             docstring_style: google
-            show_source: true
+            show_source: false
             show_root_heading: true
             show_root_toc_entry: false
             show_signature_annotations: true
             extra:
-              show_source_link: true
+              show_source_link: false
               show_return_annotation: true

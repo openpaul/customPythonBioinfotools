@@ -91,7 +91,7 @@ class TaxEntry:
         return self.__str__()
 
     @classmethod
-    def from_db_row(
+    def _from_db_row(
         cls, row: Tuple[int, Optional[str], Optional[str], Optional[str]]
     ) -> "TaxEntry":
         """Create TaxEntry from database row tuple"""
@@ -103,7 +103,7 @@ class TaxEntry:
         )
 
     @classmethod
-    def from_lineage_row(
+    def _from_lineage_row(
         cls, row: Tuple[int, Optional[str], Optional[str], Optional[str]]
     ) -> "TaxEntry":
         """Create TaxEntry from lineage query result (without parent field)"""
@@ -179,7 +179,7 @@ class UniProtTax:
         FROM lineage
         """
         rows = self.conn.execute(query, (tax_id,)).fetchall()
-        return [TaxEntry.from_lineage_row(row) for row in rows]
+        return [TaxEntry._from_lineage_row(row) for row in rows]
 
     def get_rank_lineage(self, tax_id: int) -> dict[str, str]:
         # returns a Rank: Scientifc name dict, ignores ranks that are called "clade"
