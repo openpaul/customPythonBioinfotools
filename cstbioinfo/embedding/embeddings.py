@@ -8,8 +8,6 @@ from .modelEsm2 import ESM2Embedder
 from .modelPiggen import pIgGenEmbedder
 from .modelIgbert import IgBertEmbedder
 
-# enum of all embedders named models with members ANARCII and ESM2
-
 
 class EmbedderModel(Enum):
     ANARCII = "anarcii"
