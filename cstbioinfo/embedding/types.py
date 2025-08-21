@@ -11,7 +11,7 @@ class Embedder:
             "Embedder is an abstract base class. Please use a subclass like ANARCIIEmbedder."
         )
 
-    def embed(self, sequences: List[str], pool: str = "mean") -> torch.Tensor:
+    def embed(self, sequences: List[str], pool: str = "mean", **kwargs) -> torch.Tensor:
         """
         Embed a batch of sequences. Returns [batch, hidden_dim] fixed-length embeddings.
         pool: "mean" (default) or "max" pooling over sequence length.

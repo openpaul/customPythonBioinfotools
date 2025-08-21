@@ -4,8 +4,9 @@ import numpy as np
 import torch
 from anarcii.inference.model_loader import Loader
 from anarcii.input_data_processing.tokeniser import NumberingTokeniser
-
+from tqdm import tqdm
 from cstbioinfo.embedding.types import Embedder
+from .utils import get_device
 
 
 class ANARCIIEmbedder(Embedder):
@@ -17,12 +18,7 @@ class ANARCIIEmbedder(Embedder):
         mode: str = "accuracy",
         device: str | torch.device | None = None,
     ):
-        if device is None:
-            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        else:
-            device = torch.device(device)
-
-        self.device = device
+        self.device = get_device(device)
         self.model_type = model_type.lower()
         self.mode = mode
 
@@ -57,7 +53,7 @@ class ANARCIIEmbedder(Embedder):
         return torch.tensor(tokenized, dtype=torch.long, device=self.device)  # [B, L]
 
     def embed(
-        self, sequences: List[str], pool: str = "mean", batch_size: int = 32
+        self, sequences: List[str], pool: str = "mean", batch_size: int = 32, **kwargs
     ) -> torch.Tensor:
         """
         Embed a batch of sequences. Returns [batch, hidden_dim] fixed-length embeddings.
@@ -71,7 +67,7 @@ class ANARCIIEmbedder(Embedder):
         n_seqs = len(sequences)
         embeddings = torch.empty((n_seqs, self.dimension), device=self.device)
 
-        for start in range(0, n_seqs, batch_size):
+        for start in tqdm(range(0, n_seqs, batch_size), desc="Embedding sequences"):
             end = min(start + batch_size, n_seqs)
             batch = sequences[start:end]
 

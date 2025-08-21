@@ -1,9 +1,10 @@
 from typing import List
-
+from tqdm import tqdm
 import torch
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 
 from .types import Embedder
+from .utils import get_device
 
 
 class ESM2Embedder(Embedder):
@@ -17,12 +18,7 @@ class ESM2Embedder(Embedder):
         cache_dir: str | None = None,
         max_length: int | None = 1024,
     ):
-        if device is None:
-            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        else:
-            device = torch.device(device)
-
-        self.device = device
+        self.device = get_device(device)
         if isinstance(max_length, int) and max_length > self.model_max_length:
             raise ValueError(
                 f"max_length must be less than or equal to {self.max_length}, got {max_length}."
@@ -35,7 +31,7 @@ class ESM2Embedder(Embedder):
         self.model.eval()
 
     def embed(
-        self, sequences: List[str], pool: str = "mean", batch_size: int = 32
+        self, sequences: List[str], pool: str = "mean", batch_size: int = 32, **kwargs
     ) -> torch.Tensor:
         """
         Embed a batch of sequences. Returns [batch, hidden_dim] fixed-length embeddings.
@@ -49,7 +45,7 @@ class ESM2Embedder(Embedder):
             # set to max sequence length
             self.max_length = max(len(seq) for seq in sequences)
 
-        for start in range(0, n_seqs, batch_size):
+        for start in tqdm(range(0, n_seqs, batch_size), desc="Embedding sequences"):
             end = min(start + batch_size, n_seqs)
             batch = sequences[start:end]
 
