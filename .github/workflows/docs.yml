@@ -39,7 +39,6 @@ jobs:
       run: |
         pdoc cstbioinfo \
         --output-dir site \
-        --force \
         --docformat google \
         --show-source \
         --math \
