@@ -33,7 +33,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        uv pip install --system pdoc
+        uv pip install --system pdoc '.[full]'
     
     - name: Build documentation
       run: |
