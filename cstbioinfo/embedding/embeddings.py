@@ -1,11 +1,12 @@
 from enum import Enum
 
-from cstbioinfo.embedding.types import Embedder
+from cstbioinfo.embedding.types import Embedder, PairedEmbedder
 
 from .modelAnarcii import ANARCIIEmbedder
 from .modelAntiberta2 import AntiBERTa2Embedder
 from .modelEsm2 import ESM2Embedder
 from .modelPiggen import pIgGenEmbedder
+from .modelIgbert import IgBertEmbedder
 
 # enum of all embedders named models with members ANARCII and ESM2
 
@@ -28,3 +29,14 @@ class EmbedderModel(Enum):
             return pIgGenEmbedder(**kwargs)
         else:
             raise ValueError(f"Unknown embedder model: {model}")
+
+
+class PairedEmbedderModel(Enum):
+    IGBERT = "igbert"
+
+    @classmethod
+    def get_embedder(cls, model: "PairedEmbedderModel", **kwargs) -> PairedEmbedder:
+        if model == cls.IGBERT:
+            return IgBertEmbedder(**kwargs)
+        else:
+            raise ValueError(f"Unknown paired embedder model: {model}")
