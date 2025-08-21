@@ -36,4 +36,26 @@ CI = "https://github.com/openpaul/cstbioinfo/actions"
 
 
 [project.optional-dependencies]
-test = ["pytest",  "polars", "pyarrow", "ruff"]
+# Embedding/ML dependencies for ESM2 and ANARCII models
+embedding = [
+    "torch>=2.0.0",
+    "transformers>=4.30.0",
+    "numpy>=1.24.0",
+    "anarcii",  # for ANARCII embedder
+]
+
+# All features (normal + embedding)
+full = [
+    "cstbioinfo[embedding]",
+]
+
+# Development dependencies (full + testing tools)
+dev = [
+    "cstbioinfo[full]",
+    "pytest",
+    "polars", 
+    "pyarrow",
+    "ruff",
+    "black",
+    "mypy",
+]
