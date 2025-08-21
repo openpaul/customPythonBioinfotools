@@ -16,7 +16,7 @@ class TaxId:
     lineage: list[str] = field(init=False)
     Lineage: dict[str, str] = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.lineage = ncbi.get_lineage(self.taxid)
         # Create a dictionary with ranks as keys and taxids as values
 
@@ -84,14 +84,14 @@ class TaxEntry:
     scientific_name: str
     rank: str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.taxon_id}: {self.scientific_name} ({self.common_name}) - {self.rank}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
     @classmethod
-    def from_db_row(cls, row: Tuple) -> "TaxEntry":
+    def from_db_row(cls, row: Tuple[int, Optional[str], Optional[str], Optional[str]]) -> "TaxEntry":
         """Create TaxEntry from database row tuple"""
         return cls(
             taxon_id=row[0],
@@ -101,7 +101,7 @@ class TaxEntry:
         )
 
     @classmethod
-    def from_lineage_row(cls, row: Tuple) -> "TaxEntry":
+    def from_lineage_row(cls, row: Tuple[int, Optional[str], Optional[str], Optional[str]]) -> "TaxEntry":
         """Create TaxEntry from lineage query result (without parent field)"""
         return cls(
             taxon_id=row[0],
@@ -123,7 +123,7 @@ class UniProtTax:
         ]
     )
 
-    def __init__(self, redownload: bool = False):
+    def __init__(self, redownload: bool = False) -> None:
         self.db_path = Path(user_data_dir("cstbioinfo", "openpaul") + "/uniprot_tax.db")
         # make user directory if it does not exist
         self.db_path.parent.mkdir(parents=True, exist_ok=True)

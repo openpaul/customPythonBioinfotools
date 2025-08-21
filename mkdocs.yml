@@ -57,5 +57,7 @@ plugins:
             show_source: true
             show_root_heading: true
             show_root_toc_entry: false
+            show_signature_annotations: true
             extra:
               show_source_link: true
+              show_return_annotation: true
