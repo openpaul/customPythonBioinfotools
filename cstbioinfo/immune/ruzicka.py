@@ -1,7 +1,8 @@
 from typing import Union
+
 import numpy as np
-import polars as pl
 import pandas as pd
+import polars as pl
 from tqdm import tqdm
 
 ArrayLike = Union[

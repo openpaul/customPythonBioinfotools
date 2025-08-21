@@ -1,7 +1,8 @@
-from cstbioinfo.immune.ruzicka import _ruzicka
-from cstbioinfo.immune import ruzicka_similarity
-import pytest
 import polars as pl
+import pytest
+
+from cstbioinfo.immune import ruzicka_similarity
+from cstbioinfo.immune.ruzicka import _ruzicka
 
 
 def test_ruzicka_basic_function():

@@ -1,9 +1,10 @@
-import polars as pl
-import tempfile
-import requests
-from pathlib import Path
 import gzip
 import json
+import tempfile
+from pathlib import Path
+
+import polars as pl
+import requests
 
 
 def _download_file(url: str | Path, dest: str | Path) -> None:
