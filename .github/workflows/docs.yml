@@ -33,10 +33,10 @@ jobs:
     
     - name: Install dependencies
       run: |
-        uv pip install --system pdoc ".[full]"
+        uv pip install --system pdoc
     
     - name: Build documentation
-      run: \
+      run: |
         pdoc cstbioinfo \
         --output-dir site \
         --force \
