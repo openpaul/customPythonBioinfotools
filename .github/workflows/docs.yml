@@ -33,10 +33,17 @@ jobs:
     
     - name: Install dependencies
       run: |
-        uv pip install --system mkdocs-material mkdocstrings[python] ".[full]"
+        uv pip install --system pdocs ".[full]"
     
     - name: Build documentation
-      run: mkdocs build --clean
+      run: \
+        pdoc cstbioinfo \
+        --output-dir site \
+        --force \
+        --docformat google \
+        --show-source \
+        --math \
+        --mermaid 
     
     - name: Setup Pages
       if: github.ref == 'refs/heads/main'
