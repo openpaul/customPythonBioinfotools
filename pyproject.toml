@@ -67,3 +67,13 @@ dev = [
     "mktestdocs",
     "ruff",
 ]
+
+[tool.pytest.ini_options]
+# Enable doctest collection from modules
+addopts = "--doctest-modules --doctest-ignore-import-errors"
+# Collect doctests from both test files and source modules
+testpaths = ["test", "cstbioinfo"]
+# Patterns for doctest files  
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
+# Ignore these patterns when collecting doctests
+doctest_ignore = ["cstbioinfo/__pycache__", "*/build/*"]

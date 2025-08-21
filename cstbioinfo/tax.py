@@ -1,5 +1,15 @@
 """
-Taxonomy module for working with NCBI and UniProt taxonomic databases.
+Taxonomy module for working with NCBI and UniProt taxonom    Examples:
+        >>> # Get taxonomic info for humans (taxid 9606)
+        >>> human = TaxId(9606)
+        >>> human.Species
+        'Homo sapiens'
+        >>> human.Family
+        'Hominidae'
+        >>> human.Order
+        'Primates'
+        >>> 'Eukaryota' in human.Lineage.values()
+        True
 
 This module provides convenient interfaces to work with taxonomic data from both
 NCBI and UniProt databases, allowing for easy taxonomy lookups, lineage retrieval,
@@ -132,7 +142,13 @@ class TaxId:
 
     @property
     def Species(self) -> str:
-        """Return the Species of the TaxId."""
+        """
+        Return the Species of the TaxId.
+
+        >>> human = TaxId(9606)
+        >>> human.Species
+        'Homo sapiens'
+        """
         try:
             return self.Lineage["species"]
         except KeyError:
