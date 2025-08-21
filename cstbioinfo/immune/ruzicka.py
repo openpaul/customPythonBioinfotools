@@ -2,6 +2,7 @@ from typing import Union
 import numpy as np
 import polars as pl
 import pandas as pd
+from tqdm import tqdm
 
 ArrayLike = Union[
     np.ndarray, list[float], tuple[float, ...] | list[int], tuple[int, ...]
@@ -32,15 +33,17 @@ def _ruzicka(x: ArrayLike, y: ArrayLike, top_n: int | None = None) -> float:
     if len(x) != len(y):
         raise ValueError("Input arrays must have the same length.")
 
-    if top_n is not None and (top_n <= 0 or top_n > len(x)):
-        raise ValueError(
-            "top_n must be a positive integer less than or equal to the length of the input arrays."
-        )
+    if top_n is not None and (top_n <= 0):
+        raise ValueError("top_n must be a positive integer.")
 
     a = np.asarray(x, dtype=float)
     b = np.asarray(y, dtype=float)
 
     if top_n is not None:
+        if top_n > len(a):
+            top_n = len(a)
+        if top_n > len(b):
+            top_n = len(b)
         idx_a = np.argsort(a)[-top_n:]
         idx_b = np.argsort(b)[-top_n:]
         idx = np.union1d(idx_a, idx_b)
@@ -49,7 +52,6 @@ def _ruzicka(x: ArrayLike, y: ArrayLike, top_n: int | None = None) -> float:
 
     num = np.sum(np.minimum(a, b))
     den = np.sum(np.maximum(a, b))
-    print(f"Numerator: {num}, Denominator: {den}")  # Debugging output
     return float(num / den) if den != 0 else 0.0
 
 
@@ -74,10 +76,19 @@ def ruzicka_similarity(
         ]
         raise ValueError(f"Missing columns in DataFrame: {', '.join(missing_cols)}")
 
-    results = []
     samples = df.get_column(sample_column).unique().to_list()
     # sort samples
     samples.sort()
+
+    results = [
+        {"sample_1": sample_name, "sample_2": sample_name, "similarity": 1.0}
+        for sample_name in samples
+    ]
+    comparisons = len(samples) * (len(samples) - 1) // 2
+    pbar = tqdm(
+        total=comparisons,
+        desc="Calculating Ruzicka similarity",
+    )
     for i in range(len(samples)):
         for j in range(i + 1, len(samples)):
             sample_i = samples[i]
@@ -93,6 +104,7 @@ def ruzicka_similarity(
             ).fill_null(0)
             if df_subset.height == 0:
                 # if no data for this sample pair, skip
+                pbar.update(1)
                 continue
 
             similarity = _ruzicka(
@@ -107,6 +119,14 @@ def ruzicka_similarity(
                     "similarity": similarity,
                 }
             )
+            results.append(
+                {
+                    "sample_1": sample_j,
+                    "sample_2": sample_i,
+                    "similarity": similarity,
+                }
+            )
+            pbar.update(1)
 
     if results:
         return pl.DataFrame(results)
