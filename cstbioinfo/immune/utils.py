@@ -79,6 +79,23 @@ def get_oas(path: str | Path) -> pl.DataFrame:
         > Olsen, Tobias H., Fergus Boyles, and Charlotte M. Deane. "Observed Antibody Space: A diverse database of cleaned, annotated, and translated unpaired and paired antibody sequences." Protein Science 31.1 (2022): 141-146.
 
 
+        I also recommend writing the downloaded file to disk if you plan to use it multiple times,
+        to avoid repeated downloads.
+
+        ```python
+        from pathlib import Path
+        import polars as pl
+        from cstbioinfo.immune import get_oas
+
+        local_file = Path("/path/to/local/OAS_file.parquet")
+        if not local_file.exists():
+            df = get_oas("https://opig.stats.ox.ac.uk/webapps/ngsdb/unpaired/Bashford_2013/csv/ERR220451_Heavy_Bulk.csv.gz")
+            df.write_parquet(local_file)
+        else:
+            df = pl.read_parquet(local_file)
+        print(df.head(5))
+        ```
+
     """
     # the OAS has a weird dataformat where the first row is a header
     if isinstance(path, Path):
