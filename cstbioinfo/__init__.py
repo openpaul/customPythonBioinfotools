@@ -21,13 +21,16 @@ Development is hosted on GitHub:
 
 ### Installation
 
-```bash
-pip install cstbioinfo
+```sh
+pip install git+https://github.com/openpaul/customPythonBioinfotools/
 ```
 
-For embedding functionality:
-```bash
-pip install cstbioinfo[embedding]
+Or to install with all optional dependencies:
+
+```sh
+git clone https://github.com/openpaul/customPythonBioinfotools/
+cd customPythonBioinfotools
+pip install  '.[full]'
 ```
 
 ### Basic Usage
