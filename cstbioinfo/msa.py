@@ -51,6 +51,7 @@ import shutil
 import subprocess
 import tempfile
 from typing import Optional, Union
+import numpy as np
 
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -58,18 +59,22 @@ from Bio.SeqRecord import SeqRecord
 from pymsaviz import MsaViz
 
 
-def _nuc_or_aa(seq: str) -> str:
+def _nuc_or_aa(seq: str | SeqRecord) -> str:
     """
     Determine if the sequence is nucleotide or amino acid based on content.
     Returns 'nucleotide' or 'amino_acid'.
     """
+    if isinstance(seq, SeqRecord):
+        seq = str(seq.seq)
     if all(base in "ACGTU" for base in seq.upper()):
         return "nucleotide"
     elif all(base in "ACDEFGHIKLMNPQRSTVWY" for base in seq.upper()):
         return "amino_acid"
     else:
+        invalid_chars = set(seq.upper()) - set("ACGTU") - set("ACDEFGHIKLMNPQRSTVWY")
         raise ValueError(
-            "Sequence contains invalid characters for nucleotide or amino acid."
+            f"Sequence contains invalid characters: {invalid_chars}. "
+            "Cannot determine if nucleotide or amino acid."
         )
 
 
@@ -232,3 +237,56 @@ def plot_msa(
 
         mv = MsaViz(input_filename, **kwargs)
         return mv
+
+
+def distance_matrix(
+    sequences: list[str] | list[SeqRecord],
+    align: bool = True,
+    normalize: bool = True,
+) -> np.ndarray:
+    if align is False:
+        # ensure all sequences are same length, else we pad with gaps
+        max_len = max(
+            len(seq) if isinstance(seq, str) else len(str(seq.seq)) for seq in sequences
+        )
+        padded_seqs = []
+        for i, seq in enumerate(sequences):
+            if isinstance(seq, str):
+                padded_seq = seq.ljust(max_len, "-")
+                record = SeqRecord(Seq(padded_seq), id=f"seq{i + 1}", description="")
+                padded_seqs.append(record)
+            else:
+                padded_seq = str(seq.seq).ljust(max_len, "-")
+                record = SeqRecord(
+                    Seq(padded_seq), id=seq.id, description=seq.description
+                )
+                padded_seqs.append(record)
+        sequences = padded_seqs
+    else:
+        sequences = msa(sequences)
+
+    n = len(sequences)
+    dist_matrix = np.zeros((n, n), dtype=float)
+
+    # convert to strings
+    sequences = [seq if isinstance(seq, str) else str(seq.seq) for seq in sequences]
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            seq1 = sequences[i]
+            seq2 = sequences[j]
+            if len(seq1) != len(seq2):
+                raise ValueError(
+                    "Sequences must be of equal length for distance calculation"
+                )
+            differences = sum(
+                c1 != c2 for c1, c2 in zip(seq1, seq2) if c1 != "-" and c2 != "-"
+            )
+            valid_positions = sum(c1 != "-" and c2 != "-" for c1, c2 in zip(seq1, seq2))
+            if normalize:
+                dist = differences / valid_positions if valid_positions > 0 else 0.0
+            else:
+                dist = differences
+            dist_matrix[i, j] = dist
+            dist_matrix[j, i] = dist
+    return dist_matrix
