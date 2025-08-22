@@ -5,6 +5,9 @@ cstbioinfo - Personal bioinformatics tools
 A collection of useful bioinformatics tools and utilities developed for computational biology
 and bioinformatics research.
 
+Development is hosted on GitHub:
+[https://github.com/openpaul/customPythonBioinfotools/](https://github.com/openpaul/customPythonBioinfotools/)
+
 ## Overview
 
 **cstbioinfo** provides a suite of tools for:
