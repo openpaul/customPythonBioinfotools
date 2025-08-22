@@ -12,6 +12,12 @@ from .utils import get_device
 
 
 class ANARCIIEmbedder(Embedder):
+    """
+    Embedder for protein sequences using the ANARCII model.
+    While they are trained for numbering, this class provides fixed-length
+    embeddings for antibody, shark, and TCR sequences using their transformer encoder.
+    """
+
     dimension: int = 128
 
     def __init__(
@@ -58,9 +64,14 @@ class ANARCIIEmbedder(Embedder):
         self, sequences: List[str], pool: str = "mean", batch_size: int = 32, **kwargs
     ) -> torch.Tensor:
         """
-        Embed a batch of sequences. Returns [batch, hidden_dim] fixed-length embeddings.
-        pool: "mean" (default) or "max" pooling over sequence length.
-        batch_size: Number of sequences to process at once.
+        Embed a list of protein sequences using the ANARCII model.
+        Args:
+            sequences: List of protein sequences (strings) to embed
+            pool: Pooling method over sequence length ("mean" or "max")
+            batch_size: Batch size for processing sequences
+            **kwargs: Additional arguments (not used)
+        Returns:
+            Tensor of shape (N, D) where N is number of sequences and D is embedding dimension
         """
         # Validate sequences
         if any("*" in seq for seq in sequences):

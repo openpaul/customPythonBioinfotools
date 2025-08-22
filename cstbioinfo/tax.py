@@ -1,8 +1,8 @@
 """
 Taxonomy module for working with NCBI and UniProt taxonomic databases.
-        >>> from cstbioinfo.tax import TaxId
+        >>> from cstbioinfo.tax import NCBITaxId
         >>> # Get taxonomic info for humans (taxid 9606)
-        >>> human = TaxId(9606)
+        >>> human = NCBITaxId(9606)
         >>> human.Species
         'Homo sapiens'
         >>> human.Family
@@ -20,10 +20,10 @@ Examples:
     Basic NCBI taxonomy lookup:
 
     ```python
-    from cstbioinfo.tax import TaxId
+    from cstbioinfo.tax import NCBITaxId
 
     # Get taxonomic information for humans
-    human = TaxId(9606)
+    human = NCBITaxId(9606)
     print(f"Species: {human.Species}")  # Homo sapiens
     print(f"Family: {human.Family}")    # Hominidae
     print(f"Order: {human.Order}")      # Primates
@@ -54,13 +54,15 @@ ncbi = NCBITaxa()
 
 
 @dataclass
-class TaxId:
+class NCBITaxId:
     """
     Interface to NCBI taxonomy database for taxonomic lookups.
 
     This class provides easy access to taxonomic information from NCBI's taxonomy
     database via the ETE3 library. Given a taxonomic ID, it retrieves the complete
     lineage and provides convenient properties to access different taxonomic ranks.
+    You of course can also use ETE3 directly, but this class provides a simpler interface
+    for common tasks.
 
     Args:
         taxid: NCBI taxonomic identifier
@@ -73,7 +75,7 @@ class TaxId:
     Examples:
         ```python
         # Get taxonomic info for humans (taxid 9606)
-        human = TaxId(9606)
+        human = NCBITaxId(9606)
         print(human.Species)  # "Homo sapiens"
         print(human.Family)   # "Hominidae"
         print(human.Order)    # "Primates"
@@ -82,7 +84,7 @@ class TaxId:
         print(human.Lineage)
         # {'superkingdom': 'Eukaryota', 'kingdom': 'Metazoa', ...}
         ```
-        >>> human = TaxId(9606)
+        >>> human = NCBITaxId(9606)
         >>> human.Species
         'Homo sapiens'
     """
@@ -106,7 +108,7 @@ class TaxId:
 
     @property
     def Phylum(self) -> str:
-        """Return the Phylum of the TaxId."""
+        """Return the Phylum of the NCBITaxId."""
         try:
             return self.Lineage["phylum"]
         except KeyError:
@@ -114,7 +116,7 @@ class TaxId:
 
     @property
     def Class(self) -> str:
-        """Return the Class of the TaxId."""
+        """Return the Class of the NCBITaxId."""
         try:
             return self.Lineage["class"]
         except KeyError:
@@ -122,7 +124,7 @@ class TaxId:
 
     @property
     def Order(self) -> str:
-        """Return the Order of the TaxId."""
+        """Return the Order of the NCBITaxId."""
         try:
             return self.Lineage["order"]
         except KeyError:
@@ -130,7 +132,7 @@ class TaxId:
 
     @property
     def Family(self) -> str:
-        """Return the Family of the TaxId."""
+        """Return the Family of the NCBITaxId."""
         try:
             return self.Lineage["family"]
         except KeyError:
@@ -138,7 +140,7 @@ class TaxId:
 
     @property
     def Genus(self) -> str:
-        """Return the Genus of the TaxId."""
+        """Return the Genus of the NCBITaxId."""
         try:
             return self.Lineage["genus"]
         except KeyError:
@@ -147,9 +149,9 @@ class TaxId:
     @property
     def Species(self) -> str:
         """
-        Return the Species of the TaxId.
+        Return the Species of the NCBITaxId.
 
-        >>> human = TaxId(9606)
+        >>> human = NCBITaxId(9606)
         >>> human.Species
         'Homo sapiens'
         """
