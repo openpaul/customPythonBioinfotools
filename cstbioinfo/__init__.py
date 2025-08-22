@@ -5,6 +5,10 @@ cstbioinfo - Personal bioinformatics tools
 A collection of useful bioinformatics tools and utilities developed for computational biology
 and bioinformatics research.
 
+**Note**: I maintain this package for my own work. Functions that end uop being used in publications
+will be moved to either the publication-specific code repository or published as a package on PyPi.
+This is essentially a testing ground for new ideas and code snippets. So use at your own risk!
+
 Development is hosted on GitHub:
 [https://github.com/openpaul/customPythonBioinfotools/](https://github.com/openpaul/customPythonBioinfotools/)
 
