@@ -63,6 +63,36 @@ def ruzicka_similarity(
     count_column: str = "count",
     sample_column: str = "sample_id",
 ) -> pl.DataFrame:
+    """
+    Calculate pairwise Ruzicka similarity between samples in a DataFrame.
+
+    Args:
+        df: Input DataFrame containing features, counts, and sample identifiers.
+        top_n: Number of top elements to consider for similarity calculation.
+               If None, all elements are considered.
+        feature_columns: List of columns representing features. This could be the clone id for example.
+        count_column: Column name representing the counts or frequencies of the features/clones.
+        sample_column: Column name representing the sample identifiers.
+    Returns:
+        Polars DataFrame with pairwise Ruzicka similarity scores between samples.
+
+    Example:
+        >>> import polars as pl
+        >>> from cstbioinfo.immune.ruzicka import ruzicka_similarity
+        >>> data = {
+        ...     "sample_id": ["A", "A", "B", "B", "C"],
+        ...     "v_call": ["V1", "V2", "V1", "V3", "V2"],
+        ...     "j_call": ["J1", "J1", "J1", "J2", "J1"],
+        ...     "junction_aa": ["CAR", "CAG", "CAR", "CAT", "CAG"],
+        ...     "count": [10, 5, 8, 7, 3],
+        ... }
+        >>> df = pl.DataFrame(data)
+        >>> similarity_df = ruzicka_similarity(df, top_n=2)
+        >>> print(similarity_df.shape)
+        (9, 3)
+
+        See the Ruzicka notebook in the Github repository for more examples.
+    """
     if isinstance(df, pd.DataFrame):
         df = pl.from_pandas(df)
     # pairwise Ruzicka similarity for each sample
