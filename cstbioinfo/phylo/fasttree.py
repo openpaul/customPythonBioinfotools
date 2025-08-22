@@ -1,13 +1,13 @@
-import subprocess
-from Bio import Phylo
-import tempfile
-from cstbioinfo.msa import msa, _nuc_or_aa
-from typing import Union, List
-from Bio.SeqRecord import SeqRecord
-from pathlib import Path
 import shutil
-from Bio import Phylo
-from Bio import SeqIO
+import subprocess
+import tempfile
+from pathlib import Path
+from typing import List, Union
+
+from Bio import Phylo, SeqIO
+from Bio.SeqRecord import SeqRecord
+
+from cstbioinfo.msa import _nuc_or_aa, msa
 
 
 class FastTree:
@@ -33,16 +33,22 @@ class FastTree:
                 SeqIO.write(aligned_sequences, input_path, "fasta")
 
             cmd = [self.fasttree_path]
-            if (
-                _nuc_or_aa(str(aligned_sequences[0].seq).replace("-", ""))
-                == "nucleotide"
-            ):
+            first_seq = (
+                (
+                    str(aligned_sequences[0].seq)
+                    if isinstance(aligned_sequences[0], SeqRecord)
+                    else aligned_sequences[0]
+                )
+                .replace("-", "")
+                .replace(" ", "")
+            )
+            if _nuc_or_aa(first_seq) == "nuc":
                 cmd.append("-nt")
             cmd += [str(input_path)]
 
             with open(output_path, "w") as out_f:
                 subprocess.run(cmd, stdout=out_f, check=True)
-            tree = Phylo.read(output_path, "newick")
+            tree = Phylo.read(output_path, "newick")  # pyright: ignore[reportPrivateImportUsage]
             return tree
 
 

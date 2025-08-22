@@ -47,7 +47,7 @@ class AntiBERTa2Embedder(Embedder):
         )
         self.model = RoFormerForMaskedLM.from_pretrained(
             model_name, cache_dir=cache_dir
-        ).to(self.device)
+        ).to(self.device)  # type: ignore
         self.model.eval()
 
         # Update dimension based on actual model config

@@ -31,7 +31,7 @@ class IgBertEmbedder(PairedEmbedder):
         )
         self.model = BertModel.from_pretrained(
             model_name, add_pooling_layer=False, cache_dir=cache_dir
-        ).to(self.device)
+        ).to(self.device)  # type: ignore
         self.model.eval()
 
     def embed(

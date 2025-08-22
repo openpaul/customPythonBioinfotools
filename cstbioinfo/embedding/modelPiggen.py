@@ -36,7 +36,7 @@ class pIgGenEmbedder(Embedder):
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(
             model_name, cache_dir=cache_dir
         )
-        self.model.to(self.device)
+        self.model.to(self.device)  # type: ignore
 
         # Update dimension based on actual model config
         if hasattr(self.model.config, "hidden_size"):

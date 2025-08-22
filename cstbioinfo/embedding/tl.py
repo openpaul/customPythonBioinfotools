@@ -29,4 +29,4 @@ def umap(
         data = data.cpu().numpy()  # Convert to numpy array if input is a tensor
 
     reduced = reducer.fit_transform(data)
-    return pl.DataFrame(reduced, schema=[f"dim_{i}" for i in range(reduced.shape[1])])
+    return pl.DataFrame(reduced, schema=[f"dim_{i}" for i in range(reduced.shape[1])])  # type: ignore

@@ -51,8 +51,8 @@ import shutil
 import subprocess
 import tempfile
 from typing import Optional, Union
-import numpy as np
 
+import numpy as np
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
