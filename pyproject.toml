@@ -66,6 +66,7 @@ dev = [
     "pytest",
     "mktestdocs",
     "ruff",
+    "pre-commit",
 ]
 
 [tool.pytest.ini_options]
