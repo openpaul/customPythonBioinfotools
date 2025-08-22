@@ -10,24 +10,20 @@ This repo is my attempt at standardizing some common workflows I use. I will do 
 
 There is some auto generated documentation available at [openpaul.github.io/customPythonBioinfotools](https://openpaul.github.io/customPythonBioinfotools/).
 
-## Features
-
-- **MSA**: Multiple sequence alignment with visualization
-- **Taxonomy**: Tax ID resolution and lineage analysis  
-- **Embeddings**: ESM2 and ANARCII protein embeddings *(optional)*
-
 ## Installation
 
 ```bash
+git clone https://github.com/openpaul/customPythonBioinfotools
+cd customPythonBioinfotools
 # Basic (MSA + taxonomy)
-pip install cstbioinfo
+pip install .
 
 # With embeddings
-pip install "cstbioinfo[embedding]"
+pip install ".[embeddings]"
 
 # Everything
-pip install "cstbioinfo[full]"
+pip install ".[full]"
 
 # Development
-pip install "cstbioinfo[dev]"
+pip install ".[dev]"
 ```
