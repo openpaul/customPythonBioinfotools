@@ -45,6 +45,41 @@ def strip_allele(gene_call: str) -> str:
 
 
 def get_oas(path: str | Path) -> pl.DataFrame:
+    """
+    Load an OAS (Observed Antibody Space) CSV file from a local path or URL
+    into a Polars DataFrame.
+
+    Loading OAS files is tricky because the first line is a JSON-like
+    dictionary containing metadata, and the rest is a standard CSV. This function
+    handles both local files and URLs, and extracts the metadata into
+    separate columns in the DataFrame.
+
+    Args:
+        path: Local file path or URL to the OAS CSV file (must be gzipped)
+    Returns:
+        Polars DataFrame containing the OAS data with metadata columns added
+
+
+    Examples:
+        ```python
+        from cstbioinfo.immune import get_oas
+        df = get_oas("https://opig.stats.ox.ac.uk/webapps/ngsdb/unpaired/Bashford_2013/csv/ERR220451_Heavy_Bulk.csv.gz")
+        print(df.head(5))
+        ```
+
+        Or with a local file:
+        ```python
+        df = get_oas("/path/to/local/OAS_file.csv.gz")
+        print(df.head(5))
+        ```
+
+        If you use this function to access the [OAS database](https://opig.stats.ox.ac.uk/webapps/oas/), please respect their license
+        and cite the original publication:
+
+        > Olsen, Tobias H., Fergus Boyles, and Charlotte M. Deane. "Observed Antibody Space: A diverse database of cleaned, annotated, and translated unpaired and paired antibody sequences." Protein Science 31.1 (2022): 141-146.
+
+
+    """
     # the OAS has a weird dataformat where the first row is a header
     if isinstance(path, Path):
         path = str(path)
