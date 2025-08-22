@@ -244,6 +244,30 @@ def distance_matrix(
     align: bool = True,
     normalize: bool = True,
 ) -> np.ndarray:
+    """
+    Compute a pairwise distance matrix for a list of sequences.
+
+    Calculates the pairwise distance between sequences based on the number of
+    differing positions. Optionally performs multiple sequence alignment before
+    distance calculation.
+
+    Args:
+        sequences: List of sequences (strings or SeqRecord objects)
+        align: Whether to perform multiple sequence alignment before distance calculation
+        normalize: Whether to normalize distances by sequence length (proportion of differences)
+    Returns:
+        np.ndarray: Pairwise distance matrix of shape (N, N) where N is number of sequences
+
+    Examples:
+        Basic distance matrix calculation:
+        ```python
+        sequences = [
+            "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQ",
+            "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGAQ",
+            "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQ"
+        ]
+        dist_matrix = distance_matrix(sequences, align=True, normalize=True)
+    """
     if align is False:
         # ensure all sequences are same length, else we pad with gaps
         max_len = max(
