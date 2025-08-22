@@ -153,13 +153,6 @@ def msa(
     else:
         seq_records = sequences  # type: ignore[assignment]
 
-    # Create temporary files for input and output
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".fasta", delete=False
-    ) as input_file:
-        SeqIO.write(seq_records, input_file.name, "fasta")
-        input_filename = input_file.name
-
     # Check sequence type (keeping for potential future use)
     first_seq_str = str(seq_records[0].seq)
     _nuc_or_aa(first_seq_str)
@@ -170,9 +163,6 @@ def msa(
     else:
         raise ValueError(f"Unsupported alignment method: {method}")
 
-    # Clean up temporary file after alignment
-    if os.path.exists(input_filename):
-        os.unlink(input_filename)
     return aligned_records
 
 
@@ -229,10 +219,22 @@ def plot_msa(
         Requires MAFFT for alignment and pymsaviz for visualization.
         See pymsaviz documentation for available kwargs options.
     """
-    aligned_sequences = msa(sequences, seq_ids=seq_ids)
+    sequences_seqio = []
+    for i, seq in enumerate(sequences):
+        if isinstance(seq, str):
+            if seq_ids is None:
+                seq_id = f"seq{i + 1}"
+            else:
+                seq_id = seq_ids[i]
+            record = SeqRecord(Seq(seq), id=seq_id, description="")
+            sequences_seqio.append(record)
+        elif isinstance(seq, SeqRecord):
+            sequences_seqio.append(seq)
+        else:
+            raise ValueError("Sequences must be either strings or SeqRecord objects")
 
     with tempfile.NamedTemporaryFile(mode="w", suffix=".fasta") as input_file:
-        SeqIO.write(aligned_sequences, input_file.name, "fasta")
+        SeqIO.write(sequences_seqio, input_file.name, "fasta")
         input_filename = input_file.name
 
         mv = MsaViz(input_filename, **kwargs)

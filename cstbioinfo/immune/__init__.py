@@ -6,4 +6,4 @@ antibody and TCR sequence analysis.
 """
 
 from .ruzicka import ruzicka_similarity
-from utils import get_oas
+from .utils import get_oas
