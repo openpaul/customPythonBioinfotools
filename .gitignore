@@ -10,3 +10,5 @@ venv
 build
 .vscode
 site
+.ruff_cache
+build
