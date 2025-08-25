@@ -1,5 +1,5 @@
-import polars as pl
 import pandas as pd
+import polars as pl
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 

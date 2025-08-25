@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import List, Union
 
 from Bio import Phylo, SeqIO
-from Bio.SeqRecord import SeqRecord
 from Bio.Phylo import Newick
+from Bio.SeqRecord import SeqRecord
+
 from cstbioinfo.msa import _nuc_or_aa, msa
 
 
