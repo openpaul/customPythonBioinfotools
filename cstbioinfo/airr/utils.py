@@ -54,3 +54,16 @@ def translate(
     elif isinstance(df, pl.DataFrame):
         df = df.with_columns(pl.Series(translated_seqs).alias(column + "_aa"))
     return df
+
+
+def call2gene(df: pl.DataFrame) -> pl.DataFrame:
+    # makes all call to gene colums
+    # eg v_call -> v_gene by stripping after first *
+
+    for col in df.columns:
+        if col.endswith("_call"):
+            gene_col = col.replace("_call", "_gene")
+            df = df.with_columns(
+                pl.col(col).str.split("*").list.first().alias(gene_col)
+            )
+    return df
