@@ -29,11 +29,11 @@ def perfect_paired(
             pl.col(cell_column).len().over(cell_column).alias("chain_count"),
         )
         .filter(pl.col("chain_count") == 2)
-        .drop("light_rank", "heavy_rank")
+        .drop("light_rank", "heavy_rank", "is_light", "is_heavy", "chain_count")
     )
 
 
-def clone_shape(
+def cast_to_pairs(
     df: pl.DataFrame,
     cell_column: str = "cell_id",
     umi_count_column: str = "umi_count",
