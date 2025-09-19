@@ -90,4 +90,4 @@ The package is organized into several modules:
 Apache-2.0
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"

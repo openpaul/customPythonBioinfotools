@@ -1,6 +1,6 @@
 [project]
 name = "cstbioinfo"
-version = "0.1.0"
+version = "0.1.2"
 description = "My personal bioinfo usefull tools."
 readme = "README.md"
 authors = [{name = "Paul Saary", email = "github@paulsaary.de"}]

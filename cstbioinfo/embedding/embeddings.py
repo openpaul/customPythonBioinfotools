@@ -44,7 +44,9 @@ class EmbedderModel(Enum):
     PIGGEN = "piggen"
 
     @classmethod
-    def get_embedder(cls, model: "EmbedderModel", **kwargs) -> Embedder:
+    def get_embedder(
+        cls, model: "EmbedderModel", local_only: bool = False, **kwargs
+    ) -> Embedder:
         """
         Factory method to create an embedder instance.
 
@@ -86,13 +88,13 @@ class EmbedderModel(Enum):
             ...     print("ValueError raised correctly")  # doctest: +SKIP
         """
         if model == cls.ANARCII:
-            return ANARCIIEmbedder(**kwargs)
+            return ANARCIIEmbedder(local_only=local_only, **kwargs)
         elif model == cls.ANTIBERTA2:
-            return AntiBERTa2Embedder(**kwargs)
+            return AntiBERTa2Embedder(local_only=local_only, **kwargs)
         elif model == cls.ESM2:
-            return ESM2Embedder(**kwargs)
+            return ESM2Embedder(local_only=local_only, **kwargs)
         elif model == cls.PIGGEN:
-            return pIgGenEmbedder(**kwargs)
+            return pIgGenEmbedder(local_only=local_only, **kwargs)
         else:
             raise ValueError(f"Unknown embedder model: {model}")
 
@@ -128,7 +130,9 @@ class PairedEmbedderModel(Enum):
     IGBERT = "igbert"
 
     @classmethod
-    def get_embedder(cls, model: "PairedEmbedderModel", **kwargs) -> PairedEmbedder:
+    def get_embedder(
+        cls, model: "PairedEmbedderModel", local_only: bool = False, **kwargs
+    ) -> PairedEmbedder:
         """
         Factory method to create a paired embedder instance.
 

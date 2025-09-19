@@ -18,6 +18,7 @@ class AntiBERTa2Embedder(Embedder):
         device: str | torch.device | None = None,
         cache_dir: str | None = None,
         max_length: int | None = 256,
+        local_only: bool = False,
     ):
         self.device = get_device(device)
         self.model_type = model_type.lower()
@@ -43,10 +44,12 @@ class AntiBERTa2Embedder(Embedder):
         model_name = model_name_map[self.model_type]
 
         self.tokenizer = RoFormerTokenizer.from_pretrained(
-            model_name, cache_dir=cache_dir
+            model_name,
+            cache_dir=cache_dir,
+            local_files_only=local_only,
         )
         self.model = RoFormerForMaskedLM.from_pretrained(
-            model_name, cache_dir=cache_dir
+            model_name, cache_dir=cache_dir, local_files_only=local_only
         ).to(self.device)  # type: ignore
         self.model.eval()
 

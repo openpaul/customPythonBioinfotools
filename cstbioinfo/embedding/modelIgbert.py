@@ -18,7 +18,7 @@ class IgBertEmbedder(PairedEmbedder):
         device: str | torch.device | None = None,
         cache_dir: str | None = None,
         max_length: int | None = 512,
-        local: bool = False,
+        local_only: bool = False,
     ):
         self.device = get_device(device)
         if isinstance(max_length, int) and max_length > self.model_max_length:
@@ -28,13 +28,16 @@ class IgBertEmbedder(PairedEmbedder):
         self.max_length = max_length or self.model_max_length
 
         self.tokenizer = BertTokenizer.from_pretrained(
-            model_name, do_lower_case=False, cache_dir=cache_dir, local_files_only=local
+            model_name,
+            do_lower_case=False,
+            cache_dir=cache_dir,
+            local_files_only=local_only,
         )
         self.model = BertModel.from_pretrained(
             model_name,
             add_pooling_layer=False,
             cache_dir=cache_dir,
-            local_files_only=local,
+            local_files_only=local_only,
         ).to(self.device)  # type: ignore
         self.model.eval()
 

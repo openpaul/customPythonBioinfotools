@@ -20,6 +20,7 @@ class pIgGenEmbedder(Embedder):
         device: str | torch.device | None = None,
         cache_dir: str | None = None,
         max_length: int | None = 1024,
+        local_only: bool = False,
     ):
         self.device = get_device(device)
 
@@ -30,11 +31,11 @@ class pIgGenEmbedder(Embedder):
         self.max_length = max_length
 
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
-            model_name, cache_dir=cache_dir
+            model_name, cache_dir=cache_dir, local_files_only=local_only
         )
         self.model.eval()
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(
-            model_name, cache_dir=cache_dir
+            model_name, cache_dir=cache_dir, local_files_only=local_only
         )
         self.model.to(self.device)  # type: ignore
 

@@ -25,10 +25,15 @@ class ANARCIIEmbedder(Embedder):
         model_type: str = "antibody",
         mode: str = "accuracy",
         device: str | torch.device | None = None,
+        local_only: bool = False,
     ):
         self.device = get_device(device)
         self.model_type = model_type.lower()
         self.mode = mode
+        if local_only:
+            raise NotImplementedError(
+                "Local-only loading is not supported for ANARCII."
+            )
 
         # Validate model_type
         if self.model_type not in ["antibody", "shark", "tcr"]:

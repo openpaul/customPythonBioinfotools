@@ -18,6 +18,7 @@ class ESM2Embedder(Embedder):
         device: str | torch.device | None = None,
         cache_dir: str | None = None,
         max_length: int | None = 1024,
+        local_only: bool = False,
     ):
         self.device = get_device(device)
         if isinstance(max_length, int) and max_length > self.model_max_length:
@@ -25,9 +26,11 @@ class ESM2Embedder(Embedder):
                 f"max_length must be less than or equal to {self.max_length}, got {max_length}."
             )
         self.max_length = max_length
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=cache_dir)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, cache_dir=cache_dir, local_files_only=local_only
+        )
         self.model = AutoModelForMaskedLM.from_pretrained(
-            model_name, cache_dir=cache_dir
+            model_name, cache_dir=cache_dir, local_files_only=local_only
         ).to(self.device)
         self.model.eval()
 
