@@ -4,6 +4,7 @@ from cstbioinfo.embedding.types import Embedder, PairedEmbedder
 
 from .modelAnarcii import ANARCIIEmbedder
 from .modelAntiberta2 import AntiBERTa2Embedder
+from .modelBlosum62 import Blosum62Embedder, Blosum62PairedEmbedder
 from .modelEsm2 import ESM2Embedder
 from .modelIgbert import IgBertEmbedder
 from .modelPiggen import pIgGenEmbedder
@@ -40,6 +41,7 @@ class EmbedderModel(Enum):
 
     ANARCII = "anarcii"
     ANTIBERTA2 = "antiberta2"
+    BLOSUM62 = "blosum62"
     ESM2 = "esm2"
     PIGGEN = "piggen"
 
@@ -91,6 +93,8 @@ class EmbedderModel(Enum):
             return ANARCIIEmbedder(local_only=local_only, **kwargs)
         elif model == cls.ANTIBERTA2:
             return AntiBERTa2Embedder(local_only=local_only, **kwargs)
+        elif model == cls.BLOSUM62:
+            return Blosum62Embedder(**kwargs)
         elif model == cls.ESM2:
             return ESM2Embedder(local_only=local_only, **kwargs)
         elif model == cls.PIGGEN:
@@ -127,6 +131,7 @@ class PairedEmbedderModel(Enum):
         1024
     """
 
+    BLOSUM62 = "blosum62"
     IGBERT = "igbert"
 
     @classmethod
@@ -170,7 +175,9 @@ class PairedEmbedderModel(Enum):
             >>> embeddings.shape  # doctest: +SKIP
             torch.Size([3, 1024])
         """
-        if model == cls.IGBERT:
+        if model == cls.BLOSUM62:
+            return Blosum62PairedEmbedder(**kwargs)
+        elif model == cls.IGBERT:
             return IgBertEmbedder(**kwargs)
         else:
             raise ValueError(f"Unknown paired embedder model: {model}")
