@@ -29,6 +29,13 @@ Development is hosted on GitHub:
 pip install git+https://github.com/openpaul/customPythonBioinfotools/
 ```
 
+In Pixi for example you can do:
+
+```sh
+pixi add --pypi cstbioinfo@git+https://github.com/openpaul/customPythonBioinfotools/
+```
+
+
 Or to install with all optional dependencies:
 
 ```sh

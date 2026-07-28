@@ -1,5 +1,79 @@
 import polars as pl
 
+AIRR_REQUIRED_COLUMNS: list[str] = [
+    "sequence_id",
+    "sequence",
+    "locus",
+    "v_call",
+    "j_call",
+    "junction",
+    "junction_aa",
+]
+
+AIRR_VALID_LOCI: set[str] = {"IGH", "IGK", "IGL", "TRA", "TRB", "TRG", "TRD"}
+
+
+def validate_airr_df(
+    df: pl.DataFrame,
+    required_columns: list[str] | None = None,
+    raise_on_error: bool = True,
+) -> list[str]:
+    """
+    Validate an AIRR-seq DataFrame against required columns and value constraints.
+
+    Args:
+        df: Polars DataFrame to validate.
+        required_columns: Columns that must be present and non-null. Defaults to
+            ``AIRR_REQUIRED_COLUMNS``.
+        raise_on_error: If ``True`` (default), raise ``ValueError`` on the first
+            error found. If ``False``, return all error messages instead.
+
+    Returns:
+        A list of error message strings. Empty list means the DataFrame is valid.
+
+    Raises:
+        TypeError: If ``df`` is not a polars DataFrame.
+        ValueError: If ``raise_on_error`` is ``True`` and any validation fails.
+    """
+    if not isinstance(df, pl.DataFrame):
+        raise TypeError(f"Expected a polars DataFrame, got {type(df).__name__}.")
+
+    if required_columns is None:
+        required_columns = AIRR_REQUIRED_COLUMNS
+
+    errors: list[str] = []
+
+    # Check required columns are present
+    missing = [col for col in required_columns if col not in df.columns]
+    if missing:
+        errors.append(f"Missing required columns: {missing}")
+
+    # Check for nulls in required columns that are present
+    for col in required_columns:
+        if col not in df.columns:
+            continue
+        null_count = df[col].null_count()
+        if null_count > 0:
+            errors.append(f"Column '{col}' contains {null_count} null value(s).")
+
+    # Check locus column contains only valid values
+    if "locus" in df.columns:
+        invalid_loci = (
+            df["locus"]
+            .drop_nulls()
+            .filter(~pl.Series(df["locus"].drop_nulls()).is_in(list(AIRR_VALID_LOCI)))
+        )
+        if len(invalid_loci) > 0:
+            errors.append(
+                f"Column 'locus' contains invalid values: {invalid_loci.unique().to_list()}. "
+                f"Valid values are: {sorted(AIRR_VALID_LOCI)}."
+            )
+
+    if raise_on_error and errors:
+        raise ValueError("\n".join(errors))
+
+    return errors
+
 
 def perfect_paired(
     df: pl.DataFrame, cell_column: str = "cell_id", umi_count_column: str = "umi_count"
