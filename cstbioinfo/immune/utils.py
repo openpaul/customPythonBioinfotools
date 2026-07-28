@@ -1,10 +1,87 @@
 import gzip
 import json
+import re
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 import polars as pl
 import requests
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from immunum import Annotator
+
+_NUC_ALPHABET = set("ACGTUN")
+_AA_ALPHABET = set("ACDEFGHIKLMNPQRSTVWYXBZJUO")
+
+
+def kabat_sort(positions: list[str]) -> list[str]:
+    """
+    Sorts residue position strings according to the Kabat numbering scheme.
+    Handles optional chain prefixes (e.g., 'H100A', 'L27B') or bare numbers ('100A').
+
+    Insertion order: 100 -> 100A -> 100B -> ... -> 101
+    """
+
+    def kabat_key(pos: str):
+        cleaned = str(pos).strip()
+
+        # Regex to parse optional chain prefix (H/L), integer position, and insertion code
+        match = re.match(
+            r"^(?:([A-Za-z])[\-\_]?)?(\d+)(?:[\.\-]?([A-Za-z]))?$", cleaned
+        )
+        if not match:
+            return (2, float("inf"), 0, cleaned)  # Fallback for invalid strings
+
+        chain = match.group(1).upper() if match.group(1) else ""
+        base = int(match.group(2))
+        insertion = match.group(3)
+
+        # ASCII rank for insertion codes ('A' -> 1, 'B' -> 2, etc.; base without insertion -> 0)
+        ins_rank = ord(insertion.upper()) - ord("A") + 1 if insertion else 0
+
+        # Primary key: Chain (L before H if provided, otherwise standard), Base pos, Insertion rank
+        chain_order = {"L": 0, "H": 1}.get(chain, 0)
+
+        return (chain_order, base, ins_rank)
+
+    return sorted(positions, key=kabat_key)
+
+
+def imgt_sort(positions: list[str]) -> list[str]:
+    """
+    Sorts IMGT position strings according to IMGT unique numbering rules.
+    Supports standard positions, decimal insertions (111.1, 112.1), and
+    letter insertions (111A, 112A).
+    """
+    positions = list(set(positions))  # Remove duplicates
+
+    def imgt_key(pos: str):
+        # Parses formats like: '104', '111.1', '111A', '112-A', etc.
+        match = re.match(r"^(\d+)(?:[\.\-]?([A-Za-z0-9]+))?$", str(pos).strip())
+        if not match:
+            return (float("inf"), 0, pos)  # Fallback for unexpected formats
+
+        base = int(match.group(1))
+        suffix = match.group(2)
+
+        if suffix is None:
+            sub = 0
+        elif suffix.isdigit():
+            sub = float(suffix)
+        else:
+            # Convert letters/alphanumerics into a numerical rank (A->1, B->2, etc.)
+            sub = float(ord(suffix[0].upper()) - ord("A") + 1)
+
+        # IMGT CDR3 insertion rule between 111 and 112:
+        # 111 < 111A < 111B ... < 112B < 112A < 112
+        if base == 112 and sub > 0:
+            return (111.5, -sub)
+
+        return (base, sub)
+
+    return sorted(positions, key=imgt_key)
 
 
 def _download_file(url: str | Path, dest: str | Path) -> None:
@@ -42,6 +119,190 @@ def strip_allele(gene_call: str) -> str:
     if "*" in gene_call:
         gene_call = gene_call.split("*")[0]
     return gene_call.strip()
+
+
+def _raw_seq(seq: str) -> str:
+    return seq.upper()
+
+
+def infer_sequence_type(seq: str | SeqRecord) -> str:
+    """Infer sequence type as ``nucleotide`` or ``amino_acid``."""
+    if isinstance(seq, SeqRecord):
+        seq = str(seq.seq)
+    clean = _raw_seq(seq)
+    if not clean:
+        raise ValueError("Sequence is empty.")
+
+    if not re.fullmatch(r"[A-Z]+", clean):
+        raise ValueError(
+            "Sequence contains unsupported non-letter characters. "
+            "Please provide raw nucleotide or amino-acid letters only."
+        )
+
+    chars = set(clean)
+    if chars.issubset(_NUC_ALPHABET):
+        return "nucleotide"
+    if chars.issubset(_AA_ALPHABET):
+        return "amino_acid"
+
+    raise ValueError(
+        "Sequence contains unsupported characters; cannot infer nucleotide or amino acid type."
+    )
+
+
+def find_receptor_boundaries(
+    dna_seq: str,
+    min_confidence: float = 0.5,
+    min_orf_len: int = 20,
+    chains: Sequence[str] = ("H", "K", "L", "A", "B", "G", "D"),
+    scheme: str = "imgt",
+    annotator: Annotator | None = None,
+) -> list[dict[str, Any]]:
+    """Find receptor-like domains from a nucleotide sequence via 6-frame scanning."""
+    raw = _raw_seq(dna_seq)
+    if not raw:
+        return []
+    if not set(raw).issubset(_NUC_ALPHABET):
+        invalid = sorted(set(raw) - _NUC_ALPHABET)
+        raise ValueError(
+            "DNA input contains non-IUPAC nucleotide characters for this function: "
+            f"{invalid}."
+        )
+
+    seq_obj = Seq(raw)
+    seq_len = len(seq_obj)
+    if seq_len == 0:
+        return []
+
+    anno = annotator or Annotator(
+        chains=list(chains), scheme=scheme, min_confidence=min_confidence
+    )
+    results: list[dict[str, Any]] = []
+
+    frames: dict[str, tuple[str, int, int]] = {}
+    for frame in range(3):
+        frames[f"forward_{frame + 1}"] = (
+            str(seq_obj[frame:].translate(to_stop=False)),
+            frame,
+            1,
+        )
+    rev_seq = seq_obj.reverse_complement()
+    for frame in range(3):
+        frames[f"reverse_{frame + 1}"] = (
+            str(rev_seq[frame:].translate(to_stop=False)),
+            frame,
+            -1,
+        )
+
+    for frame_name, (aa_seq, offset, strand) in frames.items():
+        if len(aa_seq) <= min_orf_len:
+            continue
+
+        result = anno.number(aa_seq)
+        chain = getattr(result, "chain", None)
+        confidence = float(getattr(result, "confidence", 0.0) or 0.0)
+        q_start = getattr(result, "query_start", None)
+        q_end = getattr(result, "query_end", None)
+
+        if chain is None or confidence < min_confidence:
+            continue
+
+        if q_start is None or q_end is None:
+            numbering = dict(getattr(result, "numbering", {}) or {})
+            numbered_len = len(numbering)
+            if numbered_len == 0:
+                continue
+            q_start = 0
+            q_end = min(len(aa_seq), numbered_len) - 1
+
+        aa_start = int(q_start)
+        aa_end = int(q_end)
+
+        if strand == 1:
+            nt_start = (aa_start * 3) + offset
+            nt_end = ((aa_end + 1) * 3) + offset - 1
+        else:
+            nt_start_rev = (aa_start * 3) + offset
+            nt_end_rev = ((aa_end + 1) * 3) + offset - 1
+            nt_start = seq_len - 1 - nt_end_rev
+            nt_end = seq_len - 1 - nt_start_rev
+
+        results.append(
+            {
+                "frame": frame_name,
+                "chain": chain,
+                "confidence": round(confidence, 3),
+                "numbering": {
+                    str(k): str(v)
+                    for k, v in dict(getattr(result, "numbering", {}) or {}).items()
+                },
+                "aa_start": aa_start,
+                "aa_end": aa_end,
+                "nt_start": int(nt_start),
+                "nt_end": int(nt_end),
+                "orf_seq": aa_seq,
+                "domain_seq": aa_seq[int(q_start) : int(q_end) + 1],
+            }
+        )
+
+    results.sort(key=lambda x: x["confidence"], reverse=True)
+    return results
+
+
+def extract_receptor_sequence(
+    sequence: str | SeqRecord,
+    min_confidence: float = 0.5,
+    min_orf_len: int = 20,
+    chains: Sequence[str] = ("H", "K", "L", "A", "B", "G", "D"),
+    scheme: str = "imgt",
+) -> dict[str, Any]:
+    """Extract a receptor AA domain from amino-acid or nucleotide input.
+
+    For nucleotide input, this uses six-frame receptor boundary detection and
+    returns the best-scoring domain. For amino-acid input, it validates by
+    numbering directly with immunum.
+    """
+    seq = str(sequence.seq) if isinstance(sequence, SeqRecord) else sequence
+    seq_type = infer_sequence_type(seq)
+    anno = Annotator(chains=list(chains), scheme=scheme, min_confidence=min_confidence)
+
+    if seq_type == "nucleotide":
+        hits = find_receptor_boundaries(
+            seq,
+            min_confidence=min_confidence,
+            min_orf_len=min_orf_len,
+            chains=chains,
+            scheme=scheme,
+            annotator=anno,
+        )
+        if not hits:
+            raise ValueError("No receptor-like domain found in nucleotide sequence.")
+        hit = hits[0]
+        return {
+            "sequence": str(hit["domain_seq"]),
+            "input_type": seq_type,
+            "chain": hit.get("chain"),
+            "confidence": float(hit.get("confidence", 0.0) or 0.0),
+            "numbering": {
+                str(k): str(v) for k, v in dict(hit.get("numbering", {}) or {}).items()
+            },
+            "best_hit": hit,
+        }
+
+    aa_seq = seq.upper()
+    res = anno.number(aa_seq)
+    if getattr(res, "chain", None) is None:
+        raise ValueError("Failed to number amino-acid sequence.")
+    return {
+        "sequence": aa_seq,
+        "input_type": seq_type,
+        "chain": getattr(res, "chain", None),
+        "confidence": float(getattr(res, "confidence", 0.0) or 0.0),
+        "numbering": {
+            str(k): str(v) for k, v in dict(getattr(res, "numbering", {}) or {}).items()
+        },
+        "best_hit": None,
+    }
 
 
 def get_oas(path: str | Path) -> pl.DataFrame:

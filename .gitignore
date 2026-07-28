@@ -12,3 +12,7 @@ build
 site
 .ruff_cache
 build
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+.pixi.toml
